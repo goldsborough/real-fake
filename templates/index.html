@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>real/fake</title>
+
+	<!-- Meta -->
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="Tool to tell if images are real or fake">
+	<meta name="keywords" content="tool, turing, test">
+	<meta name="author" content="Peter Goldsborough">
+
+	<!-- CSS -->
+	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+	<!-- JS -->
+	<script src="{{ url_for('static', filename='index.js')}}"></script>
+</head>
+
+<body>
+  <div class="count">
+    {{image_count}}/{{number_of_images}}
+  </div>
+	<img src="{{image_url}}" alt="?">
+	<div class="button-container">
+		<button type="button" name="true" onclick="predict(true)">Real</button>
+		<button type="button" name="true" onclick="predict(false)">Fake</button>
+		<button type="button" name="true" onclick="predict(null)">Skip</button>
+	</div>
+</body>
+
+</html>
