@@ -106,10 +106,5 @@ def done():
         real_predictions=flask.session['real_predictions'],
         fake_predictions=flask.session['fake_predictions'])
 
-
-def main():
-    app.run('0.0.0.0', threaded=True)
-
-
 if __name__ == '__main__':
-    main()
+    app.run()
