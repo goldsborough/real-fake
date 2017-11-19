@@ -52,6 +52,7 @@ p {
 	border-radius: 1pt;
 	box-shadow: 4px 4px rgba(0, 0, 0, 0.5);
 	padding: 10px;
+  text-align: justify;
 	width: 50%;
 }
 
