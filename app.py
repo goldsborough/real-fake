@@ -1,6 +1,4 @@
-import datetime
 import flask
-import functools
 import json
 import random
 
@@ -9,38 +7,32 @@ random.seed(42)
 app = flask.Flask('real/fake')
 app.secret_key = '9)P39f.a2C99d9+wH662[=*@'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 60
+app.jinja_env.globals.update(max=max)
 
 
-def load_data(labels_file, sample_size=50):
+def load_data(labels_file, sample_size=50, examples=3):
     labels_map = json.load(open('labels.json'))
     items = list(labels_map.items())
     real_items = [item for item in items if item[1]]
     fake_items = [item for item in items if not item[1]]
     random.shuffle(real_items)
     random.shuffle(fake_items)
+    real_examples, real_items = real_items[:examples], real_items[examples:]
+    fake_examples, fake_items = fake_items[:examples], fake_items[examples:]
     real_items = real_items[:sample_size]
     fake_items = fake_items[:sample_size]
     assert len(real_items) == len(fake_items), (len(real_items),
                                                 len(fake_items))
 
-    return zip(*real_items, *fake_items)
+    real_examples = [file for file, label in real_examples]
+    fake_examples = [file for file, label in fake_examples]
+    examples = (real_examples, fake_examples)
+    items = zip(*real_items, *fake_items)
+
+    return examples, items
 
 
-IMAGES, LABELS = load_data('labels.json')
-
-
-def nocache(view):
-    @functools.wraps(view)
-    def no_cache(*args, **kwargs):
-        response = flask.make_response(view(*args, **kwargs))
-        response.headers['Last-Modified'] = datetime.datetime.now()
-        response.headers[
-            'Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '-1'
-        return response
-
-    return functools.update_wrapper(no_cache, view)
+(REAL_EXAMPLES, FAKE_EXAMPLES), (IMAGES, LABELS) = load_data('labels.json')
 
 
 def reset():
@@ -55,14 +47,22 @@ def get_image_url(image_index):
 
 
 @app.route('/')
-@app.route('/<int:image_index>')
-@nocache
-def index(image_index=0):
+def index():
+    return flask.render_template(
+        'index.html',
+        sample_size=len(IMAGES) // 2,
+        real_examples=REAL_EXAMPLES,
+        fake_examples=FAKE_EXAMPLES)
+
+
+@app.route('/images')
+@app.route('/images/<int:image_index>')
+def images(image_index=0):
     if image_index == 0:
         reset()
     flask.session['image_index'] = image_index
     return flask.render_template(
-        'index.html',
+        'images.html',
         image_url=get_image_url(image_index),
         image_count=image_index,
         number_of_images=len(LABELS))
@@ -84,7 +84,7 @@ def predict():
                 flask.session['fake_correct'] += 1
     image_index += 1
     if image_index < len(LABELS):
-        new_url = flask.url_for('index', image_index=image_index)
+        new_url = flask.url_for('images', image_index=image_index)
     else:
         new_url = flask.url_for('done')
     response = json.dumps({
@@ -105,6 +105,7 @@ def done():
         fake_correct=flask.session['fake_correct'],
         real_predictions=flask.session['real_predictions'],
         fake_predictions=flask.session['fake_predictions'])
+
 
 if __name__ == '__main__':
     app.run()

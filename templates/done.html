@@ -2,34 +2,23 @@
 <html>
 
 <head>
-	<title>real/fake</title>
-
-	<!-- Meta -->
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Tool to tell if images are real or fake">
-	<meta name="keywords" content="tool, turing, test">
-	<meta name="author" content="Peter Goldsborough">
-
-	<!-- CSS -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	{% include 'head-common.html' %}
 </head>
 
 <body>
   <div class="done">
     You predicted
     {{real_correct + fake_correct}}/{{real_predictions + fake_predictions}}
-    ({{(real_correct + fake_correct)/(real_predictions + fake_predictions)
+    ({{(real_correct + fake_correct)/max(real_predictions + fake_predictions, 1)
        * 100}}%) correctly.
     <div class="breakdown">
       <div class="item">
         Real: {{real_correct}}/{{real_predictions}}
-              ({{real_correct/real_predictions * 100}}%)
+              ({{real_correct/max(real_predictions, 1) * 100}}%)
       </div>
       <div class="item">
         Fake: {{fake_correct}}/{{fake_predictions}}
-              ({{fake_correct/fake_predictions * 100}}%)
+              ({{fake_correct/max(fake_predictions, 1) * 100}}%)
       </div>
     </div>
   </div>

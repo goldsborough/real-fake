@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	{% include 'head-common.html' %}
+
+	<!-- JS -->
+	<script src="{{ url_for('static', filename='images.js')}}"></script>
+</head>
+
+<body>
+	<div class="count">
+		{{image_count}}/{{number_of_images}}
+	</div>
+	<img src="{{image_url}}" alt="?">
+	<div class="button-container">
+		<div class="button-row">
+			<button type="button" onclick="predict(true)">(R)eal</button>
+			<button type="button" onclick="predict(false)">(F)ake</button>
+			<button type="button" onclick="predict(null)">(S)kip</button>
+		</div>
+		<div class="button-row">
+			<a href="/done"><button type="button">Done</button></a>
+		</div>
+	</div>
+	<p class="note"><strong>Note:</strong> You can press the R, F or S key instead of clicking on the <em>Real, Fake</em> or <em>Skip</em> button.</p>
+</body>
+
+</html>

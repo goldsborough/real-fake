@@ -2,33 +2,37 @@
 <html>
 
 <head>
-	<title>real/fake</title>
-
-	<!-- Meta -->
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Tool to tell if images are real or fake">
-	<meta name="keywords" content="tool, turing, test">
-	<meta name="author" content="Peter Goldsborough">
-
-	<!-- CSS -->
-	<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+	{% include 'head-common.html' %}
 
 	<!-- JS -->
 	<script src="{{ url_for('static', filename='index.js')}}"></script>
 </head>
 
 <body>
-  <div class="count">
-    {{image_count}}/{{number_of_images}}
-  </div>
-	<img src="{{image_url}}" alt="?">
-	<div class="button-container">
-		<button type="button" name="true" onclick="predict(true)">Real</button>
-		<button type="button" name="true" onclick="predict(false)">Fake</button>
-		<button type="button" name="true" onclick="predict(null)">Skip</button>
+	<div class="intro">
+		<h1>The GAN Turing Test</h1>
+		<p>
+			Thank you for participating in the GAN turing test. The goal of this test is to quantify how realistic synthesized GAN images are. To do so, this website will show you {{sample_size}} real and {{sample_size}} fake (synthesized) images. It is your task
+			to decide for each whether that image is real or fake. At the end of the experiment, you will see your personal score at this prediction task. Please record your score (e.g. take a screenshot) and report it to the curator of this experiment.
+		</p>
 	</div>
+	<div class="examples">
+    <h2>Examples</h2>
+		<p>To give you an idea of what you will be looking at, here is a selection of {{real_examples | length}} real and {{fake_examples | length}} fake images.</p>
+		<div class="images-container">
+			<div class="images-row">
+				{% for image in real_examples %}
+				<img src="{{url_for('static', filename=image)}}" alt="?"> {% endfor %}
+				<h3>Real Examples</h3>
+			</div>
+			<div class="images-row">
+				{% for image in fake_examples %}
+				<img src="{{url_for('static', filename=image)}}" alt="?"> {% endfor %}
+				<h3>Fake Examples</h3>
+			</div>
+		</div>
+	</div>
+	<p id="go"><a href="/images">Go</a></p>
 </body>
 
 </html>
