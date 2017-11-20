@@ -22,8 +22,8 @@ def load_data(labels_file, sample_size=50, examples=3):
     assert len(real_items) == len(fake_items), (len(real_items),
                                                 len(fake_items))
 
-    real_examples = [file for file, label in real_examples]
-    fake_examples = [file for file, label in fake_examples]
+    real_examples = [file for file, _ in real_examples]
+    fake_examples = [file for file, _ in fake_examples]
     examples = (real_examples, fake_examples)
 
     items = real_items + fake_items
