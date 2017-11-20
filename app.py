@@ -127,7 +127,7 @@ def report():
         report_lines.append('{},{},{}'.format(image, l, p))
     report_path = '/tmp/report-{}.csv'.format(str(random.random())[2:])
     with open(report_path, 'w') as report_file:
-        report_file.write('\n'.join(report_lines))
+        report_file.write('\n'.join(report_lines) + '\n')
     return flask.send_file(
         report_path,
         mimetype='text/csv',
