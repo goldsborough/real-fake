@@ -87,8 +87,7 @@ def predict():
                 flask.session['fake_predictions'].append(False)
             else:
                 flask.session['fake_predictions'].append(True)
-        is_correct = LABELS[image_index] == prediction
-        flask.session['all_predictions'].append(is_correct)
+        flask.session['all_predictions'].append(prediction)
     image_index += 1
     if image_index < len(LABELS):
         new_url = flask.url_for('images', image_index=image_index)
@@ -124,7 +123,7 @@ def report():
     report_lines = ['path,label,prediction']
     for image, label, prediction in zip(IMAGES, LABELS, predictions):
         l = 1 if label else 0
-        p = l if prediction else 1 - l
+        p = 1 if prediction else 0
         report_lines.append('{},{},{}'.format(image, l, p))
     report_path = '/tmp/report-{}.csv'.format(str(random.random())[2:])
     with open(report_path, 'w') as report_file:
