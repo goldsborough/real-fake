@@ -121,7 +121,7 @@ def done():
 @app.route('/report')
 def report():
     predictions = flask.session.get('all_predictions', [])
-    report_lines = ['#path,label,prediction']
+    report_lines = ['path,label,prediction']
     for image, label, prediction in zip(IMAGES, LABELS, predictions):
         l = 1 if label else 0
         p = l if prediction else 1 - l
