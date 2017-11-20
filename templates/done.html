@@ -8,20 +8,46 @@
 <body>
   <div class="done">
     You predicted
-    {{real_correct + fake_correct}}/{{real_predictions + fake_predictions}}
-    ({{(real_correct + fake_correct)/max(real_predictions + fake_predictions, 1)
+    {{real_correct + fake_correct}}/{{len(real_predictions + fake_predictions)}}
+    ({{(real_correct + fake_correct)/max(len(real_predictions + fake_predictions), 1)
        * 100}}%) correctly.
     <div class="breakdown">
       <div class="item">
-        Real: {{real_correct}}/{{real_predictions}}
-              ({{real_correct/max(real_predictions, 1) * 100}}%)
+        Real: {{real_correct}}/{{len(real_predictions)}}
+              ({{real_correct/max(len(real_predictions), 1) * 100}}%)
       </div>
       <div class="item">
-        Fake: {{fake_correct}}/{{fake_predictions}}
-              ({{fake_correct/max(fake_predictions, 1) * 100}}%)
+        Fake: {{fake_correct}}/{{len(fake_predictions)}}
+              ({{fake_correct/max(len(fake_predictions), 1) * 100}}%)
       </div>
     </div>
   </div>
+  <div class="report">
+    <a href="/report"><p>Click here to download a text report of your score.</p></a>
+    <button id="solution-button" type="button" onclick="showSolution()">Show Solution</button>
+    <div class="report-inner" hidden>
+      <h2>Real Examples</h2>
+      {% for image, prediction in zip(real_images, real_predictions) %}
+        <div class="solution">
+          <img src="{{url_for('static', filename=image)}}" title="{{image}}" alt="{{image}}"><span>{{ "✔" if prediction else "✗"}}</span>
+        </div>
+      {% endfor %}
+      <h2>Fake Examples</h2>
+      {% for image, prediction in zip(fake_images, fake_predictions) %}
+        <div class="solution">
+          <img src="{{url_for('static', filename=image)}}" alt="{{image}}" title="{{image}}"><span>{{ "✔" if prediction else "✗"}}</span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+  <script type="text/javascript">
+    function showSolution() {
+      const button = document.querySelector("#solution-button");
+      const report = document.querySelector(".report-inner");
+      button.hidden = true;
+      report.hidden = false;
+    }
+  </script>
 </body>
 
 </html>

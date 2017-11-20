@@ -1,11 +1,14 @@
 import flask
 import json
 import random
+import tempfile
 
 app = flask.Flask('real/fake')
 app.secret_key = '9)P39f.a2C99d9+wH662[=*@'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 60
+app.jinja_env.globals.update(len=len)
 app.jinja_env.globals.update(max=max)
+app.jinja_env.globals.update(zip=zip)
 
 
 def load_data(labels_file, sample_size=50, examples=3):
@@ -37,10 +40,9 @@ def load_data(labels_file, sample_size=50, examples=3):
 
 
 def reset():
-    flask.session['real_predictions'] = 0
-    flask.session['fake_predictions'] = 0
-    flask.session['real_correct'] = 0
-    flask.session['fake_correct'] = 0
+    flask.session['real_predictions'] = []
+    flask.session['fake_predictions'] = []
+    flask.session['all_predictions'] = []
 
 
 def get_image_url(image_index):
@@ -75,14 +77,17 @@ def predict():
     image_index = flask.session['image_index']
     if prediction is not None and image_index < len(LABELS):
         if LABELS[image_index]:
-            flask.session['real_predictions'] += 1
-        else:
-            flask.session['fake_predictions'] += 1
-        if prediction == LABELS[image_index]:
             if prediction:
-                flask.session['real_correct'] += 1
+                flask.session['real_predictions'].append(True)
             else:
-                flask.session['fake_correct'] += 1
+                flask.session['real_predictions'].append(False)
+        else:
+            if prediction:
+                flask.session['fake_predictions'].append(False)
+            else:
+                flask.session['fake_predictions'].append(True)
+        is_correct = LABELS[image_index] == prediction
+        flask.session['all_predictions'].append(is_correct)
     image_index += 1
     if image_index < len(LABELS):
         new_url = flask.url_for('images', image_index=image_index)
@@ -100,12 +105,34 @@ def predict():
 
 @app.route('/done')
 def done():
+    real_images = [image for image, label in zip(IMAGES, LABELS) if label]
+    fake_images = [image for image, label in zip(IMAGES, LABELS) if not label]
     return flask.render_template(
         'done.html',
-        real_correct=flask.session['real_correct'],
-        fake_correct=flask.session['fake_correct'],
+        real_correct=sum(flask.session['real_predictions']),
+        fake_correct=sum(flask.session['fake_predictions']),
         real_predictions=flask.session['real_predictions'],
-        fake_predictions=flask.session['fake_predictions'])
+        fake_predictions=flask.session['fake_predictions'],
+        real_images=real_images,
+        fake_images=fake_images)
+
+
+@app.route('/report')
+def report():
+    predictions = flask.session.get('all_predictions', [])
+    report_lines = ['#path,label,prediction']
+    for image, label, prediction in zip(IMAGES, LABELS, predictions):
+        l = 1 if label else 0
+        p = l if prediction else 1 - l
+        report_lines.append('{},{},{}'.format(image, l, p))
+    report_path = '/tmp/report-{}.csv'.format(str(random.random())[2:])
+    with open(report_path, 'w') as report_file:
+        report_file.write('\n'.join(report_lines))
+    return flask.send_file(
+        report_path,
+        mimetype='text/csv',
+        attachment_filename='report.csv',
+        as_attachment=True)
 
 
 if __name__ == '__main__':
