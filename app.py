@@ -2,8 +2,6 @@ import flask
 import json
 import random
 
-random.seed(42)
-
 app = flask.Flask('real/fake')
 app.secret_key = '9)P39f.a2C99d9+wH662[=*@'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 60
@@ -27,9 +25,12 @@ def load_data(labels_file, sample_size=50, examples=3):
     real_examples = [file for file, label in real_examples]
     fake_examples = [file for file, label in fake_examples]
     examples = (real_examples, fake_examples)
-    items = zip(*real_items, *fake_items)
 
-    return examples, items
+    items = real_items + fake_items
+    random.shuffle(items)
+    transposed_items = zip(*items)
+
+    return examples, transposed_items
 
 
 (REAL_EXAMPLES, FAKE_EXAMPLES), (IMAGES, LABELS) = load_data('labels.json')
