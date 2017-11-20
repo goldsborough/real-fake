@@ -1,7 +1,8 @@
 import flask
 import json
 import random
-import tempfile
+
+random.seed(42)
 
 app = flask.Flask('real/fake')
 app.secret_key = '9)P39f.a2C99d9+wH662[=*@'
@@ -12,7 +13,7 @@ app.jinja_env.globals.update(zip=zip)
 
 
 def load_data(labels_file, sample_size=50, examples=3):
-    labels_map = json.load(open('labels.json'))
+    labels_map = json.load(open(labels_file))
     items = list(labels_map.items())
     real_items = [item for item in items if item[1]]
     fake_items = [item for item in items if not item[1]]
