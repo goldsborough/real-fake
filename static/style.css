@@ -133,3 +133,12 @@ a {
 .solution span {
   font-size: 20px
 }
+
+@media screen and (max-width: 32em) {
+  p { width: 80%; }
+  p.note { width: 80%; }
+  .images-row {
+    display: flex;
+    flex-direction: column;
+  }
+}
